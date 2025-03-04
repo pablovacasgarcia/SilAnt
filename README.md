@@ -1,4 +1,9 @@
 # SilAnt-The-Silent-Assistant-
-# Tener python 3.12.9 y c++
-.\venv\Scripts\activate
-pip install -r .\requierements.txt
+## Dependencias
+- python 3.12.9 
+- C++
+
+## Comandos
+```bash python -m venv venv' ```
+```bash .\venv\Scripts\activate ```
+```bash pip install -r .\requierements.txt ```
