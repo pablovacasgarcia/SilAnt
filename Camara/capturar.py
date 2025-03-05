@@ -1,20 +1,30 @@
 import cv2
 import mediapipe as mp
 
+"""
+    Este script detecta si el usuario está mirando a la cámara y si tiene la mano en frente de la cámara.
+    Para detectar la mirada, se utilizan los puntos de los ojos y la nariz.
+    Para detectar la mano, se utilizan los puntos de la mano.
+"""
 def detectar_mirada_y_mano():
+    # Inicializar los modelos de detección de rostro
     mp_face_mesh = mp.solutions.face_mesh
     face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
+    # Inicializar los modelos de detección de manos
     mp_hands = mp.solutions.hands
     hands = mp_hands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
+    # Inicializar la cámara
     cap = cv2.VideoCapture(0)
     
+    # Leer la cámara
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
             break
         
+        # Voltear la imagen horizontalmente
         frame = cv2.flip(frame, 1)
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         
