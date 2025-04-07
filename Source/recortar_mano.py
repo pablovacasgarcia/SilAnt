@@ -50,7 +50,7 @@ def recortar_mano(image, margen=0.2):
 
     return image[y_min_sq:y_max_sq, x_min_sq:x_max_sq]
 
-def procesar_imagenes(folder_path, margen=0.2):
+def procesar_imagenes(folder_path, dir_save, margen=0.2):
     """Procesa todas las imágenes en una carpeta, recorta la mano más alta con margen extra y guarda los cambios."""
     
     formatos_validos = ('.jpg', '.jpeg', '.png')
