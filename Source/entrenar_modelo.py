@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D, Dense, Dropout, Flatten
+from keras.layers import Conv2D, MaxPooling2D, Dense, Dropout, Flatten, Input
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import tensorflow as tf
 import os
@@ -8,13 +8,16 @@ import numpy as np
 from PIL import Image
 import random
 import shutil
+import matplotlib.pyplot as plt   
 
 class CrearModelo:
     modelo = None
+    history = None
     def __init__(self):
+        print("Estoy entrenando un nuevo modelo")
         self.modelo = Sequential()
-
-        self.modelo.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(48, 48, 1)))
+        self.modelo.add(Input(shape=(48, 48, 1)))
+        self.modelo.add(Conv2D(32, kernel_size=(3, 3), activation='relu'))
         self.modelo.add(Conv2D(64, kernel_size=(3, 3), activation='relu'))
         self.modelo.add(MaxPooling2D(pool_size=(2, 2)))
         self.modelo.add(Dropout(0.25))
@@ -33,7 +36,7 @@ class CrearModelo:
 
         self.modelo.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
-    def entrenar_modelo(self, gesto=None, batch_size=32, epochs=10):
+    def entrenar_modelo(self, nombre_modelo, gesto=None, batch_size=32, epochs=10):
         train_datagen = ImageDataGenerator(
             rescale=1./255,
             rotation_range=40,
@@ -68,7 +71,7 @@ class CrearModelo:
         print(self.modelo.summary())
 
         checkpoint = tf.keras.callbacks.ModelCheckpoint(
-            f"modelo_{gesto.lower()}.h5",
+            f"./Modelos/{nombre_modelo}/modelo_{gesto.lower()}.h5",
             monitor='val_accuracy',
             save_best_only=True,
             mode='max',
@@ -78,17 +81,17 @@ class CrearModelo:
         reduccion_lr = tf.keras.callbacks.ReduceLROnPlateau(
             monitor='val_loss',
             factor=0.1,
-            patience=10,
+            patience=5, # modificar según las épocas
             min_lr=0.00001
         )
         
         parada_temprana = tf.keras.callbacks.EarlyStopping(
             monitor='val_loss',
-            patience=15,
+            patience=5, # modificar según las épocas
             restore_best_weights=True
         )
 
-        self.modelo.fit(
+        self.history = self.modelo.fit(
             train_generator,
             steps_per_epoch=len(train_generator),
             epochs=epochs,
@@ -101,13 +104,16 @@ class CrearModelo:
             print("⚠️ No se ha especificado un gesto para guardar el modelo.")
             return
 
-        self.modelo.save(f"modelo_{gesto.lower()}_final.h5")
+        self.modelo.save(f"./Modelos/{nombre_modelo}/modelo_{gesto.lower()}_final.h5")
     
 
 
     
     def estructura_directorios(self, gesto=None):
-        categorias = os.listdir("./Images")
+        """
+            A partir de un gesto, prepara una estructura de directorios diviendo las imágenes en entrenamiento y validación.
+        """
+        categorias = os.listdir("./Images/train")
         random.seed(42)  # Para reproducibilidad
 
         # Crear directorios de entrenamiento y validación
@@ -121,7 +127,7 @@ class CrearModelo:
         contador_val_0 = 0
         contador_val_1 = 0
         for categoria in categorias:
-            carpeta_original = os.path.join("Images", categoria)
+            carpeta_original = os.path.join("Images", "train", categoria)
             imagenes = [f for f in os.listdir(carpeta_original) if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
                 
             if not imagenes:
@@ -153,11 +159,52 @@ class CrearModelo:
                     contador_val_0 += 1
 
             print(f"✅ {categoria}: {len(train_files)} train, {len(validate_files)} validate")
+
+    def guardar_grafico_loss_val_loss(self, num_epocas, nombre_modelo, gesto):
+        ruta = os.path.join("Images", "modelos", nombre_modelo)
+        os.makedirs(ruta, exist_ok=True)
+
+        fig, ax = plt.subplots()
+
+        loss = self.history.history["loss"]
+        val_loss = self.history.history["val_loss"]
+
+        epocas = range(1, len(loss) + 1)
+
+
+        fig, ax = plt.subplots(figsize=(10, 6)) 
+
+        ax.plot(epocas, loss, 'b-', label='Training loss')
+        ax.plot(epocas, val_loss, 'r-', label='Validation loss')
+        ax.set_title('Entrenamiento y validación Loss')
+        ax.set_xlabel('Epocas')
+        ax.set_ylabel('Loss')
+        ax.legend()
+        ax.grid(True)
+        print(f"img guardada en {ruta}")
+        fig.savefig(f"{ruta}/grafico_modelo_{gesto.lower()}.png", dpi=300, bbox_inches='tight')
+
+
+
+
         
         
 if __name__ == "__main__":
-    gesto = "Down"
-    modelo = CrearModelo()
-    modelo.estructura_directorios(gesto)
-    modelo.entrenar_modelo(gesto=gesto, batch_size=32, epochs=10)
+    # gesto = "Down"
+    # modelo.estructura_directorios(gesto)
+    # modelo.entrenar_modelo(gesto=gesto, batch_size=32, epochs=10)
+    nombre_modelo = "1"
+    gestos = os.listdir("./Images/train")
+    os.makedirs(os.path.join("./Modelos", nombre_modelo), exist_ok=True)
+
+    epocas = 20
+    for gesto in gestos:
+        print("------------------------------", end="\n\n")
+        print(f"Entrenando el modelo: {gesto.upper()}", end="\n\n")
+        print("------------------------------")
+
+        modelo = CrearModelo()
+        modelo.estructura_directorios(gesto)
+        modelo.entrenar_modelo(nombre_modelo=nombre_modelo, gesto=gesto, batch_size=32, epochs=epocas)
+        modelo.guardar_grafico_loss_val_loss(epocas, nombre_modelo, gesto)
     
