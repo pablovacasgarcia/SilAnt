@@ -50,28 +50,39 @@ def recortar_mano(image, margen=0.2):
 
     return image[y_min_sq:y_max_sq, x_min_sq:x_max_sq]
 
-def procesar_imagenes(folder_path, dir_save, margen=0.2):
-    """Procesa todas las imágenes en una carpeta, recorta la mano más alta con margen extra y guarda los cambios."""
+
+def procesar_imagenes(folder_path="Images/recortar", save_path="Images/train", margen=0.2):
+    """Procesa todas las imágenes en subcarpetas, recorta la mano y guarda en la estructura correspondiente en 'train'."""
     
     formatos_validos = ('.jpg', '.jpeg', '.png')
 
-    for filename in os.listdir(folder_path):
-        if filename.lower().endswith(formatos_validos):
-            image_path = os.path.join(folder_path, filename)
-            image = cv2.imread(image_path)
+    for root, _, files in os.walk(folder_path):
+        for filename in files:
+            if filename.lower().endswith(formatos_validos):
+                image_path = os.path.join(root, filename)
+                image = cv2.imread(image_path)
 
-            if image is None:
-                print(f"Error al cargar: {filename}")
-                continue
+                if image is None:
+                    print(f"Error al cargar: {filename}")
+                    continue
 
-            mano_recortada = recortar_mano(image, margen)
+                mano_recortada = recortar_mano(image, margen)
 
-            if mano_recortada is not None:
-                cv2.imwrite(image_path, mano_recortada)
-                print(f"✅ Procesado: {filename}")
-            else:
-                os.remove(image_path)
-                print(f"❌ Eliminado (sin mano): {filename}")
+                # Crear la ruta de guardado correspondiente manteniendo la estructura de carpetas
+                relative_path = os.path.relpath(root, folder_path)
+                save_dir = os.path.join(save_path, relative_path)
+                os.makedirs(save_dir, exist_ok=True)
+                save_image_path = os.path.join(save_dir, filename)
+
+                if mano_recortada is not None:
+                    cv2.imwrite(save_image_path, mano_recortada)
+                    print(f"✅ Procesado y guardado: {save_image_path}")
+                    os.remove(image_path)  # Eliminar la imagen original después de procesar
+                else:
+                    print(f"❌ No se detectó mano en: {image_path}, no se guarda.")
+                    os.remove(image_path)  # Eliminar la imagen original si no se detectó mano
+
+
 
 # Uso de la función
-procesar_imagenes("Images/Pruebas")
+procesar_imagenes()
