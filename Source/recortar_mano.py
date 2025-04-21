@@ -55,8 +55,11 @@ def procesar_imagenes(folder_path="Images/recortar", save_path="Images/train", m
     """Procesa todas las imágenes en subcarpetas, recorta la mano y guarda en la estructura correspondiente en 'train'."""
     
     formatos_validos = ('.jpg', '.jpeg', '.png')
+    contador = -1
+    last_dir = ""
 
     for root, _, files in os.walk(folder_path):
+
         for filename in files:
             if filename.lower().endswith(formatos_validos):
                 image_path = os.path.join(root, filename)
@@ -68,19 +71,30 @@ def procesar_imagenes(folder_path="Images/recortar", save_path="Images/train", m
 
                 mano_recortada = recortar_mano(image, margen)
 
-                # Crear la ruta de guardado correspondiente manteniendo la estructura de carpetas
                 relative_path = os.path.relpath(root, folder_path)
+
+                if last_dir != relative_path:
+                    contador = -1
+
+                if contador == -1 and last_dir != relative_path:
+                    last_dir = relative_path  
+                    ruta_prueba = os.path.join('Images', 'train', relative_path)
+                    prueba = [int(f.split(".")[0]) for f in os.listdir(ruta_prueba)]
+                    prueba.sort()
+                    contador = sorted(prueba)[len(prueba) - 1] + 1
+
+                # Crear la ruta de guardado correspondiente manteniendo la estructura de carpetas
                 save_dir = os.path.join(save_path, relative_path)
                 os.makedirs(save_dir, exist_ok=True)
-                save_image_path = os.path.join(save_dir, filename)
+                save_image_path = os.path.join(save_dir, f"{contador}.{filename.split('.')[-1]}")
 
                 if mano_recortada is not None:
                     cv2.imwrite(save_image_path, mano_recortada)
                     print(f"✅ Procesado y guardado: {save_image_path}")
-                    os.remove(image_path)  # Eliminar la imagen original después de procesar
+                    contador += 1
                 else:
                     print(f"❌ No se detectó mano en: {image_path}, no se guarda.")
-                    os.remove(image_path)  # Eliminar la imagen original si no se detectó mano
+                os.remove(image_path)  # Eliminar la imagen original independientemente de si se procesó o no
 
 
 
