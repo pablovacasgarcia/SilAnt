@@ -160,9 +160,9 @@ class CrearModelo:
 
             print(f"✅ {categoria}: {len(train_files)} train, {len(validate_files)} validate")
 
-    def guardar_grafico_loss_val_loss(self, num_epocas, nombre_modelo, gesto):
+    def guardar_grafico_loss_val_loss(self, nombre_modelo, gesto):
         ruta = os.path.join("Images", "modelos", nombre_modelo)
-        os.makedirs(ruta, exist_ok=True)
+        os.makedirs(ruta)
 
         fig, ax = plt.subplots()
 
@@ -193,9 +193,13 @@ if __name__ == "__main__":
     # gesto = "Down"
     # modelo.estructura_directorios(gesto)
     # modelo.entrenar_modelo(gesto=gesto, batch_size=32, epochs=10)
+    # Nombre que se le va a dar a los directorios. 
     nombre_modelo = "1"
     gestos = os.listdir("./Images/train")
-    os.makedirs(os.path.join("./Modelos", nombre_modelo), exist_ok=True)
+    ruta = os.path.join("./Modelos", nombre_modelo)
+    if os.path.exists(ruta):
+        raise Exception("Ese directorio ya existe. Elige otro nombre")
+    os.makedirs(os.path.join("./Modelos", nombre_modelo))
 
     epocas = 20
     for gesto in gestos:
@@ -206,5 +210,5 @@ if __name__ == "__main__":
         modelo = CrearModelo()
         modelo.estructura_directorios(gesto)
         modelo.entrenar_modelo(nombre_modelo=nombre_modelo, gesto=gesto, batch_size=32, epochs=epocas)
-        modelo.guardar_grafico_loss_val_loss(epocas, nombre_modelo, gesto)
+        modelo.guardar_grafico_loss_val_loss(nombre_modelo, gesto)
     
