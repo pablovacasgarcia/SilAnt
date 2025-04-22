@@ -79,9 +79,10 @@ def procesar_imagenes(folder_path="Images/recortar", save_path="Images/train", m
                 if contador == -1 and last_dir != relative_path:
                     last_dir = relative_path  
                     ruta_prueba = os.path.join('Images', 'train', relative_path)
+                    os.makedirs(ruta_prueba, exist_ok=True)
                     prueba = [int(f.split(".")[0]) for f in os.listdir(ruta_prueba)]
                     prueba.sort()
-                    contador = sorted(prueba)[len(prueba) - 1] + 1
+                    contador = sorted(prueba)[len(prueba) - 1] + 1 if prueba else 0
 
                 # Crear la ruta de guardado correspondiente manteniendo la estructura de carpetas
                 save_dir = os.path.join(save_path, relative_path)
