@@ -160,39 +160,39 @@ class CrearModelo:
 
             print(f"✅ {categoria}: {len(train_files)} train, {len(validate_files)} validate")
 
-        def guardar_grafico_loss_val_loss(self, nombre_modelo, gesto):
-            ruta = os.path.join("Images", "modelos", nombre_modelo)
-            os.makedirs(ruta, exist_ok=True)
+    def guardar_grafico_loss_val_loss(self, nombre_modelo, gesto):
+        ruta = os.path.join("Images", "modelos", nombre_modelo)
+        os.makedirs(ruta, exist_ok=True)
 
-            loss = self.history.history["loss"]
-            val_loss = self.history.history["val_loss"]
-            accuracy = self.history.history["accuracy"]
-            val_accuracy = self.history.history["val_accuracy"]
-            epocas = range(1, len(loss) + 1)
+        loss = self.history.history["loss"]
+        val_loss = self.history.history["val_loss"]
+        accuracy = self.history.history["accuracy"]
+        val_accuracy = self.history.history["val_accuracy"]
+        epocas = range(1, len(loss) + 1)
 
-            # Gráfico de pérdida
-            fig1, ax1 = plt.subplots(figsize=(10, 6))
-            ax1.plot(epocas, loss, 'b-', label='Training Loss')
-            ax1.plot(epocas, val_loss, 'r-', label='Validation Loss')
-            ax1.set_title('Pérdida (Loss)')
-            ax1.set_xlabel('Épocas')
-            ax1.set_ylabel('Loss')
-            ax1.legend()
-            ax1.grid(True)
-            fig1.savefig(f"{ruta}/loss_modelo_{gesto.lower()}.png", dpi=300, bbox_inches='tight')
+        # Gráfico de pérdida
+        fig1, ax1 = plt.subplots(figsize=(10, 6))
+        ax1.plot(epocas, loss, 'b-', label='Training Loss')
+        ax1.plot(epocas, val_loss, 'r-', label='Validation Loss')
+        ax1.set_title('Pérdida (Loss)')
+        ax1.set_xlabel('Épocas')
+        ax1.set_ylabel('Loss')
+        ax1.legend()
+        ax1.grid(True)
+        fig1.savefig(f"{ruta}/loss_modelo_{gesto.lower()}.png", dpi=300, bbox_inches='tight')
 
-            # Gráfico de precisión
-            fig2, ax2 = plt.subplots(figsize=(10, 6))
-            ax2.plot(epocas, accuracy, 'g-', label='Training Accuracy')
-            ax2.plot(epocas, val_accuracy, 'orange', label='Validation Accuracy')
-            ax2.set_title('Precisión (Accuracy)')
-            ax2.set_xlabel('Épocas')
-            ax2.set_ylabel('Accuracy')
-            ax2.legend()
-            ax2.grid(True)
-            fig2.savefig(f"{ruta}/accuracy_modelo_{gesto.lower()}.png", dpi=300, bbox_inches='tight')
+        # Gráfico de precisión
+        fig2, ax2 = plt.subplots(figsize=(10, 6))
+        ax2.plot(epocas, accuracy, 'g-', label='Training Accuracy')
+        ax2.plot(epocas, val_accuracy, 'orange', label='Validation Accuracy')
+        ax2.set_title('Precisión (Accuracy)')
+        ax2.set_xlabel('Épocas')
+        ax2.set_ylabel('Accuracy')
+        ax2.legend()
+        ax2.grid(True)
+        fig2.savefig(f"{ruta}/accuracy_modelo_{gesto.lower()}.png", dpi=300, bbox_inches='tight')
 
-            print(f"✅ Imágenes guardadas: loss y accuracy en {ruta}")
+        print(f"✅ Imágenes guardadas: loss y accuracy en {ruta}")
 
 
   
@@ -218,5 +218,5 @@ if __name__ == "__main__":
         modelo = CrearModelo()
         modelo.estructura_directorios(gesto)
         modelo.entrenar_modelo(nombre_modelo=nombre_modelo, gesto=gesto, batch_size=32, epochs=epocas)
-        modelo.guardar_graficos(nombre_modelo, gesto)
+        modelo.guardar_grafico_loss_val_loss(nombre_modelo, gesto)
     
