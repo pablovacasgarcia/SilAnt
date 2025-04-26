@@ -3,12 +3,14 @@ import mediapipe as mp
 import numpy as np
 import os
 
+
+mp_hands = mp.solutions.hands
+hands = mp_hands.Hands(static_image_mode=True, max_num_hands=2, min_detection_confidence=0.5)
+
 def recortar_mano(image, margen=0.2):
     """Detecta la mano más alta en una imagen y devuelve un recorte cuadrado con margen extra."""
     
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    mp_hands = mp.solutions.hands
-    hands = mp_hands.Hands(static_image_mode=True, max_num_hands=2, min_detection_confidence=0.5)
     
     results = hands.process(image_rgb)
     if not results.multi_hand_landmarks:
