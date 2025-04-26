@@ -3,3 +3,4 @@ Dataset
 __pycache__/
 venv_insti
 Images/recortar
+.vscode
