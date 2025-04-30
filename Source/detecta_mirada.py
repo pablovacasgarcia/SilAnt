@@ -2,11 +2,16 @@ import cv2
 import mediapipe as mp
 import numpy as np
 from tensorflow.keras.models import load_model
+import os
 
+modelos = {}
+dir = '4'
 # Cargar modelos
-modelo_stop = load_model('./Modelos/101/modelo_stop_final.h5')
-modelo_next = load_model('./Modelos/101/modelo_next_final.h5')
-modelo_prev = load_model('./Modelos/101/modelo_prev_final.h5')
+for i in os.listdir(f'./Modelos/{dir}'):
+    if i.endswith('final.h5'):
+        nombre_modelo = i.split('_')[1]
+        modelos[nombre_modelo] = load_model(f"./Modelos/{dir}/{i}")
+
 
 # Inicializar MediaPipe
 mp_face_mesh = mp.solutions.face_mesh
@@ -61,6 +66,10 @@ def recortar_mano(image, margen=0.2):
 
 def detectar_mirada_y_gestos():
     cap = cv2.VideoCapture(0)
+    frame_counter = 0
+    prediccion_intervalo = 10
+
+    gesto_detectado = "NO DETECTADO"
 
     while cap.isOpened():
         ret, frame = cap.read()
@@ -70,8 +79,6 @@ def detectar_mirada_y_gestos():
         frame = cv2.flip(frame, 1)
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         face_result = face_mesh.process(rgb_frame)
-
-        gesto_detectado = "NO DETECTADO"
 
         if face_result.multi_face_landmarks:
             for face_landmarks in face_result.multi_face_landmarks:
@@ -84,27 +91,25 @@ def detectar_mirada_y_gestos():
                     cv2.putText(frame, "Mirando a la camara", (50, 50),
                                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-                    mano = recortar_mano(frame)
-                    if mano is not None:
-                        mano_gray = cv2.cvtColor(mano, cv2.COLOR_BGR2GRAY)
-                        mano_resized = cv2.resize(mano_gray, (48, 48))
-                        mano_normalized = mano_resized / 255.0
-                        input_tensor = mano_normalized.reshape(1, 48, 48, 1)
+                    if frame_counter % prediccion_intervalo == 0:
+                        frame_counter = 0
+                        mano = recortar_mano(frame)
+                        if mano is not None:
+                            mano_gray = cv2.cvtColor(mano, cv2.COLOR_BGR2GRAY)
+                            mano_resized = cv2.resize(mano_gray, (48, 48))
+                            mano_normalized = mano_resized / 255.0
+                            input_tensor = mano_normalized.reshape(1, 48, 48, 1)
 
-                        pred_stop = modelo_stop.predict(input_tensor)[0][0]
-                        pred_next = modelo_next.predict(input_tensor)[0][0]
-                        pred_prev = modelo_prev.predict(input_tensor)[0][0]
-
-                        if pred_stop > 0.5:
-                            gesto_detectado = "STOP"
-                        elif pred_next > 0.5:
-                            gesto_detectado = "NEXT"
-                        elif pred_prev > 0.5:
-                            gesto_detectado = "PREV"
-                        else:
                             gesto_detectado = "NINGUNO"
-                    else:
-                        gesto_detectado = "NO MANO"
+                            for gesto, modelo in modelos.items():
+                                prediccion = modelo.predict(input_tensor)[0][0]
+                                if prediccion > 0.5:
+                                    gesto_detectado = gesto.upper()
+                                    break
+                        else:
+                            gesto_detectado = "NO MANO"
+
+        frame_counter += 1
 
         cv2.putText(frame, f"Gesto: {gesto_detectado}", (50, 100),
                     cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
@@ -115,6 +120,7 @@ def detectar_mirada_y_gestos():
 
     cap.release()
     cv2.destroyAllWindows()
+
 
 if __name__ == "__main__":
     detectar_mirada_y_gestos()
