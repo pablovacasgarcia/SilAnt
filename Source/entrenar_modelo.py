@@ -38,14 +38,14 @@ class CrearModelo:
     def entrenar_modelo(self, nombre_modelo, gesto=None, batch_size=32, epochs=10):
         train_datagen = ImageDataGenerator(
             rescale=1./255,
-            rotation_range=40,
             width_shift_range=0.1,
             height_shift_range=0.1,
-            shear_range=0.1,
+            shear_range=0.05,
             zoom_range=0.1,
-            horizontal_flip=True,
+            horizontal_flip=False,
             fill_mode='nearest'
         )
+
 
         val_datagen = ImageDataGenerator(
             rescale=1./255
@@ -221,7 +221,7 @@ def evaluar_modelo(nombre_modelo, gesto):
         
 if __name__ == "__main__":
     # Nombre que se le va a dar a los directorios. 
-    nombre_modelo = "3"
+    nombre_modelo = "4"
     gestos = os.listdir("./Images/train")
     ruta = os.path.join("./Modelos", nombre_modelo)
     if os.path.exists(ruta):
