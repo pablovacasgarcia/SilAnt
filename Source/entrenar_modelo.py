@@ -1,11 +1,10 @@
-from keras.models import Sequential
+from keras.models import Sequential, load_model
 from keras.layers import Conv2D, MaxPooling2D, Dense, Dropout, Flatten, Input
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import tensorflow as tf
 import os
-import pandas as pd
 import numpy as np
-from PIL import Image
+import cv2
 import random
 import shutil
 import matplotlib.pyplot as plt   
@@ -194,15 +193,35 @@ class CrearModelo:
 
         print(f"✅ Imágenes guardadas: loss y accuracy en {ruta}")
 
+def evaluar_modelo(nombre_modelo, gesto):
+    """
+    Evalúa el modelo entrenado con un conjunto de datos de prueba.
+    """
+    X = []         # imágenes procesadas
+    y = []         # 1 si la imagen es 'up', 0 en caso contrario
 
+    for archivo in os.listdir('./Images/Pruebas'):
+        if archivo.endswith('.jpg'):
+            ruta = os.path.join('Images', 'Pruebas', archivo)
+            img = cv2.imread(ruta, cv2.IMREAD_GRAYSCALE)
+            img = cv2.resize(img, (48, 48)) / 255.0
+            img = img.reshape((48, 48, 1))
+            X.append(img)
+
+            # Etiqueta binaria
+            etiqueta = 1 if archivo.split('-')[0] == gesto else 0
+            y.append(etiqueta)
+
+    X = np.array(X)
+    y = np.array(y)
+    modelo_up = load_model(f"./Modelos/{nombre_modelo}/modelo_{gesto.lower()}_final.h5")
+    loss, accuracy = modelo_up.evaluate(X, y)
+    print(f'Evaluando modelo {gesto.upper()}: Pérdida: {loss:.4f}, Precisión: {accuracy:.4f}')
   
         
 if __name__ == "__main__":
-    # gesto = "Down"
-    # modelo.estructura_directorios(gesto)
-    # modelo.entrenar_modelo(gesto=gesto, batch_size=32, epochs=10)
     # Nombre que se le va a dar a los directorios. 
-    nombre_modelo = "101"
+    nombre_modelo = "3"
     gestos = os.listdir("./Images/train")
     ruta = os.path.join("./Modelos", nombre_modelo)
     if os.path.exists(ruta):
@@ -219,4 +238,14 @@ if __name__ == "__main__":
         modelo.estructura_directorios(gesto)
         modelo.entrenar_modelo(nombre_modelo=nombre_modelo, gesto=gesto, batch_size=32, epochs=epocas)
         modelo.guardar_grafico_loss_val_loss(nombre_modelo, gesto)
+        evaluar_modelo(nombre_modelo=nombre_modelo, gesto=gesto)
+
+
     
+    # Evaluar un modelo sin realizar los pasos de entrenamiento
+    """
+    nombre_modelo = "3"
+    gestos = os.listdir("./Images/train")
+    for gesto in gestos:
+        evaluar_modelo(nombre_modelo=nombre_modelo, gesto=gesto)
+    """
