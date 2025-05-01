@@ -5,7 +5,7 @@ from tensorflow.keras.models import load_model
 import os
 
 modelos = {}
-dir = '4'
+dir = '102'
 # Cargar modelos
 for i in os.listdir(f'./Modelos/{dir}'):
     if i.endswith('final.h5'):
