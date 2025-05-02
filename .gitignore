@@ -4,3 +4,4 @@ __pycache__/
 venv_insti
 Images/recortar
 .vscode
+db.sqlite3
