@@ -41,6 +41,7 @@ IABDProyectoFinal/
    git clone https://github.com/pablovacasgarcia/SilAnt.git
    cd IABDProyectoFinal
    ```
+
 2. Crea un entorno virtual
 ```bash 
 python -m venv venv' 
@@ -51,6 +52,7 @@ python -m venv venv'
 ```bash 
 .\venv\Scripts\activate 
 ```
+
 - Linux/Mac
 ```bash 
 source ./venv/bin/activate 
@@ -66,17 +68,23 @@ source ./venv/bin/activate
 ## **Uso**
 
 ### **API de Predicción de Gestos**
-1. Envía una solicitud POST a `/api/predict/` con una imagen en el campo `image`.
-   ```bash
-   curl -X POST -F "image=@path_to_image.jpg" http://127.0.0.1:8000/api/predict/
-   ```
+1. Primero iniciamos la API:
+```bash
+cd api_gestos
+python manage.py runserver
+```
+
+2. Abrimos una nueva terminal e iniciamos el script para probar la API:
+```bash
+python ./Source/detecta_mirada.py
+```
 
 2. Recibirás una respuesta JSON con el resultado de la predicción:
-   ```json
-   {
-       "prediction": "Gesto detectado"
-   }
-   ```
+```json
+{
+      "gesto": "Gesto detectado"
+}
+```
 
 ### **Aplicación Web**
 1. Inicia la aplicación Web: 
