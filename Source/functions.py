@@ -107,4 +107,4 @@ def abrir_youtube():
     print("YouTube abierto en el navegador.")
 
 # Ejecutar la función
-abrir_youtube()
+# abrir_youtube()
