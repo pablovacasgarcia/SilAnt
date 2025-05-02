@@ -112,6 +112,3 @@ No se requieren credenciales específicas para este proyecto. Sin embargo, aseg�
 - Pablo Vacas García.
 - Juan Manuel García Moyano.
 - Ángel Talavera Garrido.
-```
-
----
