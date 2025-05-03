@@ -102,4 +102,4 @@ def procesar_imagenes(folder_path="Images/recortar", save_path="Images/train", m
 
 
 # Uso de la función
-procesar_imagenes(save_path="Images/extra")
+procesar_imagenes()
