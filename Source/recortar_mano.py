@@ -80,7 +80,7 @@ def procesar_imagenes(folder_path="Images/recortar", save_path="Images/train", m
 
                 if contador == -1 and last_dir != relative_path:
                     last_dir = relative_path  
-                    ruta_prueba = os.path.join('Images', 'train', relative_path)
+                    ruta_prueba = os.path.join(*save_path.split("/"), relative_path)
                     os.makedirs(ruta_prueba, exist_ok=True)
                     prueba = [int(f.split(".")[0]) for f in os.listdir(ruta_prueba)]
                     prueba.sort()
@@ -102,4 +102,4 @@ def procesar_imagenes(folder_path="Images/recortar", save_path="Images/train", m
 
 
 # Uso de la función
-procesar_imagenes()
+procesar_imagenes(save_path="Images/extra")
