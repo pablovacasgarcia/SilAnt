@@ -1,7 +1,6 @@
 venv
 Dataset
 __pycache__/
-venv_insti
 .vscode
 db.sqlite3
 app
