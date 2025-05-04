@@ -221,7 +221,7 @@ def evaluar_modelo(nombre_modelo, gesto):
         
 if __name__ == "__main__":
     # Nombre que se le va a dar a los directorios. 
-    nombre_modelo = "103"
+    nombre_modelo = "7"
     gestos = os.listdir("./Images/train")
     ruta = os.path.join("./Modelos", nombre_modelo)
     if os.path.exists(ruta):

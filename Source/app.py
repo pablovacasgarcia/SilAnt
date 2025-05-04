@@ -8,7 +8,7 @@ import threading
 import functions
 
 modelos = {}
-dir = '102'
+dir = '6'
 for i in os.listdir(f'./Modelos/{dir}'):
     if i.endswith('final.h5'):
         nombre_modelo = i.split('_')[1]
