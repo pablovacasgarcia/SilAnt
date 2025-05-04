@@ -1,17 +1,7 @@
 import cv2
 import mediapipe as mp
-import numpy as np
-from tensorflow.keras.models import load_model
-import os
 import requests
 import threading
-
-modelos = {}
-dir = '102'
-for i in os.listdir(f'./Modelos/{dir}'):
-    if i.endswith('final.h5'):
-        nombre_modelo = i.split('_')[1]
-        modelos[nombre_modelo] = load_model(f"./Modelos/{dir}/{i}")
 
 mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5)
