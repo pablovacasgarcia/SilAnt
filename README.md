@@ -35,10 +35,10 @@ IABDProyectoFinal/
 
 ### **Instalación**
 1. Clona este repositorio:
-   ```bash
-   git clone https://github.com/pablovacasgarcia/SilAnt.git
-   cd IABDProyectoFinal
-   ```
+```bash
+git clone https://github.com/pablovacasgarcia/SilAnt.git
+cd SilAnt
+```
 
 2. Crea un entorno virtual
 ```bash 
@@ -74,7 +74,7 @@ python manage.py runserver
 
 2. Abrimos una nueva terminal e iniciamos el script para probar la API:
 ```bash
-python ./Source/detecta_mirada.py
+python ./Source/app.py
 ```
 
 2. Recibirás una respuesta JSON con el resultado de la predicción:
@@ -84,19 +84,11 @@ python ./Source/detecta_mirada.py
 }
 ```
 
-### **Aplicación Web**
-1. Inicia la aplicación Web: 
- ```bash
-python ./Web/app.py
- ```
-2. Accede a la interfaz web en `http://127.0.0.1:5000/`.
-3. Visualiza el video en tiempo real con detección de mirada y gestos.
-
 ---
 
 ## **Consideraciones**
-- Los modelos entrenados deben estar en la carpeta Modelos y configurados correctamente en los scripts.
-- Asegúrate de que las imágenes de entrenamiento estén organizadas en `/image/train`.
+- Los modelos entrenados están en la carpeta Modelos y configurados correctamente en los scripts.
+- Asegúrate de que las imágenes de entrenamiento estén organizadas en `/Image/train`.
 - Configura las rutas de los modelos en los scripts de predicción en `/Modelos/XX`.
 
 ---
