@@ -66,7 +66,7 @@ source ./venv/bin/activate
 ## **Uso**
 
 ### **API de Predicción de Gestos**
-1. Primero iniciamos la API:
+1. Primero iniciamos la API, que recogerá los frames y devolverá una respuesta con el gesto en JSON:
 ```bash
 cd api_gestos
 python manage.py runserver
@@ -77,7 +77,7 @@ python manage.py runserver
 python ./Source/app.py
 ```
 
-2. Recibirás una respuesta JSON con el resultado de la predicción:
+3. Se abrirá el programa, que detecta cuando miramos a la cámara, mostrando un círculo verde, para analizar los gestos, recogerá los frames y enviará la petición a la API que devolverá el siguiente resultado, cada gesto activará una función determinada:
 ```json
 {
       "gesto": "Gesto detectado"
