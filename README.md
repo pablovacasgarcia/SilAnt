@@ -1,6 +1,6 @@
 # Proyecto Final: Detección de Gestos y Mirada
 
-Este proyecto implementa un sistema de detección de gestos y mirada utilizando modelos de aprendizaje profundo y herramientas de visión por computadora. Incluye una API basada en Django para predicciones de gestos y una aplicación web con Flask para la detección en tiempo real.
+Este proyecto implementa un sistema de detección de gestos y mirada utilizando modelos de aprendizaje profundo y herramientas de visión por computadora. Incluye una API basada en Django para predicciones de gestos y una aplicación para la detección en tiempo real.
 
 
 ## **Estructura del Proyecto**
@@ -10,8 +10,7 @@ IABDProyectoFinal/
 ├── api_gestos/          # API en Django para predicción de gestos
 ├── Images/              # Imágenes de entrenamiento y modelos
 ├── Modelos/             # Modelos entrenados en formato .h5
-├── Source/              # Scripts para entrenamiento y procesamiento
-├── Web/                 # Aplicación web con Flask
+├── Source/              # Scripts para procesamiento, entrenamiento y la aplicación.
 └── README.md            # Documentación del proyecto
 ```
 
@@ -31,7 +30,6 @@ IABDProyectoFinal/
   - NumPy
   - Pillow
   - scikit-learn
-  - Flask-Cors
 - Otros:
   - Navegador web para la interfaz de usuario.
 
