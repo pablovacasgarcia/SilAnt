@@ -7,18 +7,8 @@ import requests
 import threading
 import functions
 
-modelos = {}
-dir = '6'
-for i in os.listdir(f'./Modelos/{dir}'):
-    if i.endswith('final.h5'):
-        nombre_modelo = i.split('_')[1]
-        modelos[nombre_modelo] = load_model(f"./Modelos/{dir}/{i}")
-
 mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5)
-
-mp_hands = mp.solutions.hands
-hands = mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
 gesto_detectado = "NO DETECTADO"
 gesto_anterior = None
@@ -136,8 +126,7 @@ def detectar_mirada_y_gestos():
             centro_y = alto - 50
             cv2.circle(frame, (centro_x, centro_y), 10, (0, 255, 0), -1)
 
-        cv2.putText(frame, f"Gesto: {gesto_detectado}", (50, 100),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+        
         cv2.imshow("Gesto + Mirada", frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
