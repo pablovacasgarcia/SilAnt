@@ -221,7 +221,7 @@ def evaluar_modelo(nombre_modelo, gesto, target_size, reshape):
         
 if __name__ == "__main__":
     # Nombre que se le va a dar a los directorios. 
-    nombre_modelo = "8"
+    nombre_modelo = "106"
 
     gestos = os.listdir("./Images/train")
     ruta = os.path.join("./Modelos", nombre_modelo)
@@ -230,8 +230,8 @@ if __name__ == "__main__":
     os.makedirs(os.path.join("./Modelos", nombre_modelo))
 
     epocas = 15
-    target_size = (60, 60)
-    shape=(60, 60, 1)
+    target_size = (80, 80)
+    shape=(80, 80, 1)
     for gesto in gestos:
         print("------------------------------", end="\n\n")
         print(f"Entrenando el modelo: {gesto.upper()}", end="\n\n")
