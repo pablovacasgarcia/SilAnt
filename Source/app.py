@@ -82,7 +82,7 @@ def enviar_imagen(frame):
 
 # Dibuja el menú sobre el frame cuando está activo
 def mostrar_menu_en_frame(frame):
-    cv2.putText(frame, "Abrir aplicación:", (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
+    cv2.putText(frame, "Abrir aplicacion:", (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
     cv2.putText(frame, "1 -> YouTube", (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
     cv2.putText(frame, "2 -> Spotify", (50, 250), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
     cv2.putText(frame, "3 -> Cerrar menu", (50, 300), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
