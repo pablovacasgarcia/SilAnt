@@ -1,8 +1,8 @@
 venv
 Dataset
 __pycache__/
-venv_insti
-Images/recortar
 .vscode
 db.sqlite3
 app
+Images/recortar
+app_desktop

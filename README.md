@@ -1,6 +1,6 @@
 # Proyecto Final: Detección de Gestos y Mirada
 
-Este proyecto implementa un sistema de detección de gestos y mirada utilizando modelos de aprendizaje profundo y herramientas de visión por computadora. Incluye una API basada en Django para predicciones de gestos y una aplicación web con Flask para la detección en tiempo real.
+Este proyecto implementa un sistema de detección de gestos y mirada utilizando modelos de aprendizaje profundo y herramientas de visión por computadora. Incluye una API basada en Django para predicciones de gestos y una aplicación para la detección en tiempo real.
 
 
 ## **Estructura del Proyecto**
@@ -10,8 +10,7 @@ IABDProyectoFinal/
 ├── api_gestos/          # API en Django para predicción de gestos
 ├── Images/              # Imágenes de entrenamiento y modelos
 ├── Modelos/             # Modelos entrenados en formato .h5
-├── Source/              # Scripts para entrenamiento y procesamiento
-├── Web/                 # Aplicación web con Flask
+├── Source/              # Scripts para procesamiento, entrenamiento y la aplicación.
 └── README.md            # Documentación del proyecto
 ```
 
@@ -31,16 +30,15 @@ IABDProyectoFinal/
   - NumPy
   - Pillow
   - scikit-learn
-  - Flask-Cors
 - Otros:
   - Navegador web para la interfaz de usuario.
 
 ### **Instalación**
 1. Clona este repositorio:
-   ```bash
-   git clone https://github.com/pablovacasgarcia/SilAnt.git
-   cd IABDProyectoFinal
-   ```
+```bash
+git clone https://github.com/pablovacasgarcia/SilAnt.git
+cd SilAnt
+```
 
 2. Crea un entorno virtual
 ```bash 
@@ -68,7 +66,7 @@ source ./venv/bin/activate
 ## **Uso**
 
 ### **API de Predicción de Gestos**
-1. Primero iniciamos la API:
+1. Primero iniciamos la API, que recogerá los frames y devolverá una respuesta con el gesto en JSON:
 ```bash
 cd api_gestos
 python manage.py runserver
@@ -76,29 +74,21 @@ python manage.py runserver
 
 2. Abrimos una nueva terminal e iniciamos el script para probar la API:
 ```bash
-python ./Source/detecta_mirada.py
+python ./Source/app.py
 ```
 
-2. Recibirás una respuesta JSON con el resultado de la predicción:
+3. Se abrirá el programa, que detecta cuando miramos a la cámara, mostrando un círculo verde, para analizar los gestos, recogerá los frames y enviará la petición a la API que devolverá el siguiente resultado, cada gesto activará una función determinada:
 ```json
 {
       "gesto": "Gesto detectado"
 }
 ```
 
-### **Aplicación Web**
-1. Inicia la aplicación Web: 
- ```bash
-python ./Web/app.py
- ```
-2. Accede a la interfaz web en `http://127.0.0.1:5000/`.
-3. Visualiza el video en tiempo real con detección de mirada y gestos.
-
 ---
 
 ## **Consideraciones**
-- Los modelos entrenados deben estar en la carpeta Modelos y configurados correctamente en los scripts.
-- Asegúrate de que las imágenes de entrenamiento estén organizadas en `/image/train`.
+- Los modelos entrenados están en la carpeta Modelos y configurados correctamente en los scripts.
+- Asegúrate de que las imágenes de entrenamiento estén organizadas en `/Image/train`.
 - Configura las rutas de los modelos en los scripts de predicción en `/Modelos/XX`.
 
 ---

@@ -12,10 +12,10 @@ import matplotlib.pyplot as plt
 class CrearModelo:
     modelo = None
     history = None
-    def __init__(self):
+    def __init__(self, shape=(48, 48, 1)):
         print("Estoy entrenando un nuevo modelo")
         self.modelo = Sequential()
-        self.modelo.add(Input(shape=(48, 48, 1)))
+        self.modelo.add(Input(shape=shape))
         self.modelo.add(Conv2D(32, kernel_size=(3, 3), activation='relu'))
         self.modelo.add(Conv2D(64, kernel_size=(3, 3), activation='relu'))
         self.modelo.add(MaxPooling2D(pool_size=(2, 2)))
@@ -35,7 +35,7 @@ class CrearModelo:
 
         self.modelo.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
-    def entrenar_modelo(self, nombre_modelo, gesto=None, batch_size=32, epochs=10):
+    def entrenar_modelo(self, nombre_modelo, target_size, gesto=None, batch_size=32, epochs=10):
         train_datagen = ImageDataGenerator(
             rescale=1./255,
             width_shift_range=0.1,
@@ -53,7 +53,7 @@ class CrearModelo:
 
         train_generator = train_datagen.flow_from_directory(
             os.path.join("Dataset", "train"),
-            target_size=(48, 48),
+            target_size=target_size,
             batch_size=batch_size,
             color_mode='grayscale',
             class_mode='binary'
@@ -61,7 +61,7 @@ class CrearModelo:
 
         val_generator = val_datagen.flow_from_directory(
             os.path.join("Dataset", 'validate'),
-            target_size=(48, 48),
+            target_size=target_size,
             batch_size=batch_size,
             color_mode='grayscale',
             class_mode='binary'
@@ -193,7 +193,7 @@ class CrearModelo:
 
         print(f"✅ Imágenes guardadas: loss y accuracy en {ruta}")
 
-def evaluar_modelo(nombre_modelo, gesto):
+def evaluar_modelo(nombre_modelo, gesto, target_size, reshape):
     """
     Evalúa el modelo entrenado con un conjunto de datos de prueba.
     """
@@ -204,8 +204,8 @@ def evaluar_modelo(nombre_modelo, gesto):
         if archivo.endswith('.jpg'):
             ruta = os.path.join('Images', 'Pruebas', archivo)
             img = cv2.imread(ruta, cv2.IMREAD_GRAYSCALE)
-            img = cv2.resize(img, (48, 48)) / 255.0
-            img = img.reshape((48, 48, 1))
+            img = cv2.resize(img, target_size) / 255.0
+            img = img.reshape(reshape)
             X.append(img)
 
             # Etiqueta binaria
@@ -221,24 +221,27 @@ def evaluar_modelo(nombre_modelo, gesto):
         
 if __name__ == "__main__":
     # Nombre que se le va a dar a los directorios. 
-    nombre_modelo = "103"
+    nombre_modelo = "106"
+
     gestos = os.listdir("./Images/train")
     ruta = os.path.join("./Modelos", nombre_modelo)
     if os.path.exists(ruta):
         raise Exception("Ese directorio ya existe. Elige otro nombre")
     os.makedirs(os.path.join("./Modelos", nombre_modelo))
 
-    epocas = 20
+    epocas = 15
+    target_size = (80, 80)
+    shape=(80, 80, 1)
     for gesto in gestos:
         print("------------------------------", end="\n\n")
         print(f"Entrenando el modelo: {gesto.upper()}", end="\n\n")
         print("------------------------------")
 
-        modelo = CrearModelo()
+        modelo = CrearModelo(shape=shape)
         modelo.estructura_directorios(gesto)
-        modelo.entrenar_modelo(nombre_modelo=nombre_modelo, gesto=gesto, batch_size=32, epochs=epocas)
+        modelo.entrenar_modelo(nombre_modelo=nombre_modelo, target_size=target_size, gesto=gesto, batch_size=32, epochs=epocas)
         modelo.guardar_grafico_loss_val_loss(nombre_modelo, gesto)
-        evaluar_modelo(nombre_modelo=nombre_modelo, gesto=gesto)
+        evaluar_modelo(nombre_modelo=nombre_modelo, gesto=gesto, target_size=target_size, reshape=shape)
 
 
     
