@@ -2,31 +2,38 @@ from ctypes import cast, POINTER
 from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 import pyautogui
-import os
+import gc
 import sys
 import subprocess
 import webbrowser
 
+import comtypes 
 
 def cambiar_volumen(ajuste):
     """
-        Función para cambiar el volumen del sistema
-        :param ajuste: Ajuste de volumen, rango de -1.0 a 1.0
+    Función para cambiar el volumen del sistema. Maneja correctamente hilos con COM.
     """
+    comtypes.CoInitialize()  # Inicializa COM para este hilo
+    volumen = None
+    try:
+        dispositivos = AudioUtilities.GetSpeakers()
+        interfaz = dispositivos.Activate(
+            IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+        volumen = cast(interfaz, POINTER(IAudioEndpointVolume))
 
-    # Obtener interfaz de volumen
-    dispositivos = AudioUtilities.GetSpeakers()
-    interfaz = dispositivos.Activate(
-        IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-    volumen = cast(interfaz, POINTER(IAudioEndpointVolume))
+        volumen_actual = volumen.GetMasterVolumeLevelScalar()
+        nuevo_volumen = max(0.0, min(1.0, volumen_actual + ajuste))
 
-    # Obtener volumen actual (rango 0.0 - 1.0)
-    volumen_actual = volumen.GetMasterVolumeLevelScalar()
-    nuevo_volumen = max(0.0, min(1.0, volumen_actual + ajuste))
+        volumen.SetMasterVolumeLevelScalar(nuevo_volumen, None)
+        print(f"Nuevo volumen: {nuevo_volumen * 100:.2f}%")
+    except Exception as e:
+        print("Error al cambiar volumen:", e)
+    finally:
+        volumen = None  # Elimina referencias
+        gc.collect()    # Fuerza la liberación
+        comtypes.CoUninitialize()  # Libera COM
 
-    # Cambiar volumen
-    volumen.SetMasterVolumeLevelScalar(nuevo_volumen, None)
-    print(f"Nuevo volumen: {nuevo_volumen * 100:.2f}%")
+
 
 # Subir volumen en un 5%                
 # cambiar_volumen(0.05)
