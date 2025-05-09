@@ -3,6 +3,4 @@ Dataset
 __pycache__/
 .vscode
 db.sqlite3
-app
 Images/recortar
-app_desktop
