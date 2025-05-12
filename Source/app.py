@@ -15,6 +15,7 @@ face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_con
 # Variables globales para el estado del sistema
 gesto_detectado = "NO DETECTADO"
 gesto_anterior = None
+procesando_prediccion = False
 menu_activo = False
 mostrar_menu = False
 frame_mostrar_menu = None  # (No usado directamente, pero reservado para mostrar menú en un frame)
@@ -45,6 +46,7 @@ def ejecutar_accion_por_gesto(gesto):
         elif gesto == "THREE":
             print("Cerrando menú.")
             menu_activo = False
+
         return
 
     # Si el gesto es nuevo (no es el mismo que el anterior)
@@ -64,11 +66,17 @@ def ejecutar_accion_por_gesto(gesto):
 
 # Envía un frame al servidor local para predecir el gesto
 def enviar_imagen(frame):
-    global gesto_detectado
-    _, img_encoded = cv2.imencode('.jpg', frame)  # Codifica el frame a JPEG
+    global gesto_detectado, procesando_prediccion
+    if procesando_prediccion:
+        return  # Ya hay una petición en curso
+
+    procesando_prediccion = True  # Marca como ocupado
+
+    _, img_encoded = cv2.imencode('.jpg', frame)
+
     try:
         response = requests.post(
-            'http://localhost:8000/predecir/gesto/',  # Ruta del endpoint de predicción
+            'http://localhost:8000/predecir/gesto/',
             files={'img': ('frame.jpg', img_encoded.tobytes(), 'image/jpeg')}
         )
         if response.status_code == 200:
@@ -76,9 +84,12 @@ def enviar_imagen(frame):
             gesto_detectado = data.get('gesto', 'NO DETECTADO')
             ejecutar_accion_por_gesto(gesto_detectado)
         else:
-            print("Error:", response.status_code)
+            print("Error en respuesta:", response.status_code)
     except Exception as e:
         print("Excepción al enviar imagen:", e)
+    finally:
+        procesando_prediccion = False  # Libera el flag al final
+
 
 # Dibuja el menú sobre el frame cuando está activo
 def mostrar_menu_en_frame(frame):
@@ -101,6 +112,7 @@ def detectar_mirada_y_gestos():
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
+            print("No se pudo leer frame")
             break
 
         frame = cv2.flip(frame, 1)  # Espejo para parecerse más a un reflejo
@@ -141,6 +153,9 @@ def detectar_mirada_y_gestos():
             centro_x = ancho // 2
             centro_y = alto - 50
             cv2.circle(frame, (centro_x, centro_y), 10, (0, 255, 0), -1)
+            cv2.putText(frame, f"Gesto: {gesto_detectado}", (50, 50),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2
+                    )
 
         # Muestra el frame en pantalla
         cv2.imshow("Gesto + Mirada", frame)
