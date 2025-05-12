@@ -1,5 +1,5 @@
 import mediapipe as mp  # Importado al inicio por compatibilidad; evita errores si se importa más tarde
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QSizePolicy
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QImage, QPixmap
 import cv2
@@ -146,6 +146,8 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("SilAnt")
         self.setGeometry(100, 100, 640, 480)
+        self.setMinimumSize(640, 480)  # Tamaño mínimo de la ventana
+        self.setMaximumSize(1920, 1080) # Tamaño máximo de la ventana
 
         # Configuración del layout principal
         central_widget = QWidget()
@@ -155,6 +157,8 @@ class MainWindow(QMainWindow):
 
         # Etiqueta para mostrar la imagen de la cámara
         self.lbl_camara = QLabel()
+        self.lbl_camara.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.lbl_camara.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.lbl_camara)
 
         # Etiqueta para mostrar el gesto detectado
@@ -223,7 +227,10 @@ class MainWindow(QMainWindow):
             bytes_per_line = ch * w
 
             q_img = QImage(rgb_frame.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
-            self.lbl_camara.setPixmap(QPixmap.fromImage(q_img))
+            pixmap = QPixmap.fromImage(q_img)
+            scaled_pixmap = pixmap.scaled(self.lbl_camara.size(), Qt.AspectRatioMode.KeepAspectRatio)
+            self.lbl_camara.setPixmap(scaled_pixmap)
+            # self.lbl_camara.setPixmap(QPixmap.fromImage(q_img))
 
 
 

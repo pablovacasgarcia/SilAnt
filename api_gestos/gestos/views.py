@@ -7,7 +7,7 @@ import numpy as np
 
 # Create your views here.
 
-ruta_modelos = '../Modelos/106'
+ruta_modelos = '../Modelos/108'
 
 modelos = {}
 
@@ -30,9 +30,9 @@ def predecir_gesto(request):
         mano = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
         if mano is not None:
             mano_gray = cv2.cvtColor(mano, cv2.COLOR_BGR2GRAY)
-            mano_resized = cv2.resize(mano_gray, (80, 80))
+            mano_resized = cv2.resize(mano_gray, (48, 48))
             mano_normalized = mano_resized / 255.0
-            input_tensor = mano_normalized.reshape(1, 80, 80, 1)
+            input_tensor = mano_normalized.reshape(1, 48, 48, 1)
 
             gesto_detectado = "NINGUNO"
             for gesto, modelo in modelos.items():
