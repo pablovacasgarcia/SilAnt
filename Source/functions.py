@@ -18,11 +18,18 @@ def cambiar_volumen(ajuste):
     try:
         dispositivos = AudioUtilities.GetSpeakers()
         interfaz = dispositivos.Activate(
-            IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+            IAudioEndpointVolume._iid_, CLSCTX_ALL, None
+        )
         volumen = cast(interfaz, POINTER(IAudioEndpointVolume))
 
         volumen_actual = volumen.GetMasterVolumeLevelScalar()
-        nuevo_volumen = max(0.0, min(1.0, volumen_actual + ajuste))
+        if volumen_actual + ajuste >= 1.0:
+            nuevo_volumen = 1.0
+
+        elif volumen_actual + ajuste <= 0.0:
+            nuevo_volumen = 0.0
+        else:  
+            nuevo_volumen = max(0.0, min(1.0, volumen_actual + ajuste))
 
         volumen.SetMasterVolumeLevelScalar(nuevo_volumen, None)
         print(f"Nuevo volumen: {nuevo_volumen * 100:.2f}%")
