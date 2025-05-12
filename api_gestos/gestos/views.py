@@ -8,7 +8,7 @@ import numpy as np
 
 # Create your views here.
 
-ruta_modelos = '../Modelos/7'
+ruta_modelos = '../Modelos/106'
 
 modelos = {}
 
@@ -37,9 +37,9 @@ def predecir_gesto(request):
         mano = recortar_mano(img)
         if mano is not None:
             mano_gray = cv2.cvtColor(mano, cv2.COLOR_BGR2GRAY)
-            mano_resized = cv2.resize(mano_gray, (48, 48))
+            mano_resized = cv2.resize(mano_gray, (80, 80))
             mano_normalized = mano_resized / 255.0
-            input_tensor = mano_normalized.reshape(1, 48, 48, 1)
+            input_tensor = mano_normalized.reshape(1, 80, 80, 1)
 
             gesto_detectado = "NINGUNO"
             for gesto, modelo in modelos.items():

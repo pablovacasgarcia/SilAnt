@@ -95,8 +95,8 @@ def detectar_mirada_y_gestos():
     prediccion_intervalo = 50  # Intervalo entre predicciones (cada 50 frames)
 
     # Ventana de visualización en modo pantalla completa
-    cv2.namedWindow("Gesto + Mirada", cv2.WND_PROP_FULLSCREEN)
-    cv2.setWindowProperty("Gesto + Mirada", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+    cv2.namedWindow("Gesto + Mirada", cv2.WINDOW_NORMAL)
+    cv2.setWindowProperty("Gesto + Mirada", cv2.WINDOW_NORMAL, cv2.WINDOW_NORMAL)
 
     while cap.isOpened():
         ret, frame = cap.read()
