@@ -12,6 +12,9 @@ import functions  # Módulo personalizado con funciones específicas (como contr
 mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
+mp_hands = mp.solutions.hands
+hands = mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.5, min_tracking_confidence=0.5)
+
 # Variables globales para el estado del sistema
 gesto_detectado = "NO DETECTADO"
 gesto_anterior = None
@@ -64,31 +67,83 @@ def ejecutar_accion_por_gesto(gesto):
                 accion()
         gesto_anterior = gesto
 
+
+def recortar_mano(image, margen=0.2):
+    """Detecta la mano más alta en una imagen y devuelve un recorte cuadrado con margen extra."""
+    
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    
+    results = hands.process(image_rgb)
+    if not results.multi_hand_landmarks:
+        return None  # No se detectó ninguna mano
+
+    min_y = float('inf')
+    best_hand_bbox = None
+    image_h, image_w, _ = image.shape
+
+    for hand_landmarks in results.multi_hand_landmarks:
+        x_coords = [int(landmark.x * image_w) for landmark in hand_landmarks.landmark]
+        y_coords = [int(landmark.y * image_h) for landmark in hand_landmarks.landmark]
+
+        x_min, x_max = min(x_coords), max(x_coords)
+        y_min, y_max = min(y_coords), max(y_coords)
+
+        if y_min < min_y:
+            min_y = y_min
+            best_hand_bbox = (x_min, y_min, x_max, y_max)
+
+    if best_hand_bbox is None:
+        return None
+
+    x_min, y_min, x_max, y_max = best_hand_bbox
+
+    # Calcular el tamaño del cuadrado y agregar margen
+    side_length = max(x_max - x_min, y_max - y_min)
+    extra_space = int(side_length * margen)
+    side_length += extra_space * 2  # Aumentamos por ambos lados
+
+    # Centro del cuadrado
+    center_x, center_y = (x_min + x_max) // 2, (y_min + y_max) // 2
+
+    # Calcular nuevas coordenadas con margen extra
+    x_min_sq = max(center_x - side_length // 2, 0)
+    y_min_sq = max(center_y - side_length // 2, 0)
+    x_max_sq = min(center_x + side_length // 2, image_w)
+    y_max_sq = min(center_y + side_length // 2, image_h)
+
+    return image[y_min_sq:y_max_sq, x_min_sq:x_max_sq] 
+
 # Envía un frame al servidor local para predecir el gesto
 def enviar_imagen(frame):
-    global gesto_detectado, procesando_prediccion
-    if procesando_prediccion:
-        return  # Ya hay una petición en curso
+    mano = recortar_mano(frame)
 
-    procesando_prediccion = True  # Marca como ocupado
+    if mano is None:
+        print("No se detectó mano")
+        return  
+    else:
+        global gesto_detectado, procesando_prediccion
+        if procesando_prediccion:
+            return  # Ya hay una petición en curso
 
-    _, img_encoded = cv2.imencode('.jpg', frame)
+        procesando_prediccion = True  # Marca como ocupado
 
-    try:
-        response = requests.post(
-            'http://localhost:8000/predecir/gesto/',
-            files={'img': ('frame.jpg', img_encoded.tobytes(), 'image/jpeg')}
-        )
-        if response.status_code == 200:
-            data = response.json()
-            gesto_detectado = data.get('gesto', 'NO DETECTADO')
-            ejecutar_accion_por_gesto(gesto_detectado)
-        else:
-            print("Error en respuesta:", response.status_code)
-    except Exception as e:
-        print("Excepción al enviar imagen:", e)
-    finally:
-        procesando_prediccion = False  # Libera el flag al final
+        _, img_encoded = cv2.imencode('.jpg', mano)
+
+        try:
+            response = requests.post(
+                'http://localhost:8000/predecir/gesto/',
+                files={'img': ('frame.jpg', img_encoded.tobytes(), 'image/jpeg')}
+            )
+            if response.status_code == 200:
+                data = response.json()
+                gesto_detectado = data.get('gesto', 'NO DETECTADO')
+                ejecutar_accion_por_gesto(gesto_detectado)
+            else:
+                print("Error en respuesta:", response.status_code)
+        except Exception as e:
+            print("Excepción al enviar imagen:", e)
+        finally:
+            procesando_prediccion = False  # Libera el flag al final
 
 
 # Dibuja el menú sobre el frame cuando está activo
