@@ -11,10 +11,9 @@ import comtypes
 
 def cambiar_volumen(ajuste):
     """
-    Función para cambiar el volumen del sistema. Maneja correctamente hilos con COM.
+    Función para cambiar el volumen del sistema. 
+    Usa pycaw sin inicialización explícita de COM (ya lo maneja internamente).
     """
-    comtypes.CoInitialize()  # Inicializa COM para este hilo
-    volumen = None
     try:
         dispositivos = AudioUtilities.GetSpeakers()
         interfaz = dispositivos.Activate(
@@ -23,22 +22,11 @@ def cambiar_volumen(ajuste):
         volumen = cast(interfaz, POINTER(IAudioEndpointVolume))
 
         volumen_actual = volumen.GetMasterVolumeLevelScalar()
-        if volumen_actual + ajuste >= 1.0:
-            nuevo_volumen = 1.0
-
-        elif volumen_actual + ajuste <= 0.0:
-            nuevo_volumen = 0.0
-        else:  
-            nuevo_volumen = max(0.0, min(1.0, volumen_actual + ajuste))
-
+        nuevo_volumen = max(0.0, min(1.0, volumen_actual + ajuste))
         volumen.SetMasterVolumeLevelScalar(nuevo_volumen, None)
         print(f"Nuevo volumen: {nuevo_volumen * 100:.2f}%")
     except Exception as e:
         print("Error al cambiar volumen:", e)
-    finally:
-        volumen = None  # Elimina referencias
-        gc.collect()    # Fuerza la liberación
-        comtypes.CoUninitialize()  # Libera COM
 
 
 
