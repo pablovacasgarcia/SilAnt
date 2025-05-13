@@ -176,7 +176,6 @@ class MainWindow(QMainWindow):
         self.timer.timeout.connect(self.actualizar_frame)
         self.timer.start(30)  # Cada 30ms
 
-        self.frame_counter = 0
         self.intervalo_prediccion = 50  # Intervalo de frames para enviar imagen al servidor
     # Método que actualiza los frames de la cámara y realiza predicción si corresponde
     def actualizar_frame(self):
@@ -199,11 +198,8 @@ class MainWindow(QMainWindow):
                     if dx < 0.02:  # Umbral para determinar si está mirando de frente
                         mirando = True
 
-            # Si está mirando de frente y es momento de predecir
-            self.frame_counter += 1
-            
-            if mirando and self.frame_counter % self.intervalo_prediccion == 0:
-                self.frame_counter = 0
+            # Si está mirando de frente y es momento de predecir  
+            if mirando:
                 mano = recortar_mano(rgb_frame)
                 if mano is not None: 
                     # Ejecutar predicción en hilo aparte
